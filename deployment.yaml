@@ -1,0 +1,89 @@
+# 这是一个简化的手动部署清单
+# 从GitHub Actions流水线下载自动生成的k8s-manifest.yaml以获取最新的镜像标签
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: go-logger-config
+  namespace: default
+data:
+  log-interval: "2"
+  log-message: "手动部署的Go日志程序"
+  server-port: "8080"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: go-logger-deployment
+  namespace: default
+  labels:
+    app: go-logger
+    managed-by: manual
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: go-logger
+  template:
+    metadata:
+      labels:
+        app: go-logger
+    spec:
+      containers:
+      - name: go-logger
+        image: ghcr.io/YOUR_USERNAME/go-logger-demo:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        env:
+        - name: LOG_INTERVAL
+          valueFrom:
+            configMapKeyRef:
+              name: go-logger-config
+              key: log-interval
+        - name: LOG_MESSAGE
+          valueFrom:
+            configMapKeyRef:
+              name: go-logger-config
+              key: log-message
+        - name: SERVER_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: go-logger-config
+              key: server-port
+        - name: HOSTNAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "200m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: go-logger-service
+  namespace: default
+spec:
+  type: ClusterIP
+  selector:
+    app: go-logger
+  ports:
+  - port: 80
+    targetPort: 8080
