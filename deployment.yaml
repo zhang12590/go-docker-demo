@@ -29,9 +29,11 @@ spec:
       labels:
         app: go-logger
     spec:
+      imagePullSecrets:
+      - name: ghcr-secret
       containers:
       - name: go-logger
-        image: ghcr.io/YOUR_USERNAME/go-logger-demo:latest
+        image: ghcr.io/zhang12590/go-logger-demo:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 8080

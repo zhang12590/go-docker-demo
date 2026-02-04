@@ -17,6 +17,7 @@ on:
 env:
   REGISTRY: ghcr.io
   # 使用小写的仓库名
+  # 这里的 github.repository_owner 代表当前GitHub仓库的拥有者用户名（个人账号或组织名）
   IMAGE_NAME: ${{ github.repository_owner }}/go-logger-demo
 
 jobs:
