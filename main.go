@@ -146,6 +146,7 @@ func main() {
 		go startHTTPServer()
 	}
 
+	fmt.Println("Hello, World!")
 	// 开始日志循环
 	startLogging()
 }
