@@ -7,7 +7,7 @@ COPY main.go ./
 
 # 设置构建参数
 ARG TARGETOS=linux
-ARG TARGETARCH=amd64
+ARG TARGETARCH=arm64
 ARG VERSION=1.0.0
 ARG BUILD_TIME=unknown
 
